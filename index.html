@@ -1,0 +1,347 @@
+<!DOCTYPE html>
+<html lang="en" >
+<head>
+  <meta charset="UTF-8">
+  <title>Untitled</title>
+  
+
+</head>
+<body>
+<!-- partial:index.partial.html -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Video Downloader</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Arial', sans-serif;
+            transition: color 0.3s, background-color 0.3s;
+        }
+        body {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            background: linear-gradient(135deg, #1c1c2f, #1f3c88);
+            color: #fff;
+            overflow: hidden;
+            opacity: 0; /* Start invisible */
+            animation: fadeIn 1s forwards; /* Fade-in for the intro */
+            transition: background-color 0.5s, color 0.5s; /* Smooth transition */
+        }
+        .dark-mode {
+            background: #000; /* Dark black theme */
+            color: #f9f9f9; /* Light text for contrast */
+        }
+        h1 {
+            font-size: 2.5rem;
+            margin-bottom: 20px;
+        }
+        .input-section, .history-section {
+            width: 90%;
+            max-width: 600px;
+            margin-top: 20px;
+            padding: 20px;
+            border-radius: 25px;
+            background: rgba(255, 255, 255, 0.1);
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+            opacity: 0; /* Start invisible */
+            animation: fadeIn 1s forwards; /* Fade-in for the sections */
+        }
+        .input-section {
+            animation-delay: 0.2s;
+        }
+        .history-section {
+            animation-delay: 0.4s;
+        }
+        input[type="url"] {
+            width: 100%;
+            padding: 12px;
+            margin-top: 10px;
+            margin-bottom: 10px;
+            border: 1px solid #ddd;
+            border-radius: 25px; /* Capsule style */
+            outline: none;
+            transition: border-color 0.3s, box-shadow 0.3s;
+            background: rgba(255, 255, 255, 0.2);
+            color: #fff;
+        }
+        input[type="url"]:focus {
+            border-color: #4c8cff;
+            box-shadow: 0 0 8px rgba(76, 140, 255, 0.4);
+        }
+        select {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #ddd;
+            border-radius: 25px; /* Capsule style */
+            margin-bottom: 10px;
+            background: rgba(255, 255, 255, 0.2);
+            color: #fff;
+            transition: background-color 0.3s, border-color 0.3s;
+        }
+        select:focus {
+            border-color: #4c8cff;
+        }
+        button {
+            padding: 12px 24px;
+            color: white;
+            background-color: #4c8cff; /* Lighter button color */
+            border: none;
+            border-radius: 25px; /* Capsule style */
+            cursor: pointer;
+            font-size: 16px;
+            transition: background-color 0.3s, transform 0.3s, box-shadow 0.3s;
+        }
+        button:hover {
+            background-color: #0074e8;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.4);
+        }
+        button:active {
+            transform: translateY(0);
+        }
+        .message {
+            margin-top: 10px;
+            font-size: 1rem;
+            display: none;
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+        .message.show {
+            display: block;
+            opacity: 1;
+            animation: fadeIn 0.3s ease;
+        }
+        .loading {
+            display: none;
+            font-size: 1.2rem;
+            animation: rotate 1s linear infinite;
+        }
+        .loading.show {
+            display: inline-block;
+        }
+        .progress {
+            width: 100%;
+            background-color: #f3f3f3;
+            border-radius: 25px; /* Capsule style */
+            overflow: hidden;
+            margin-top: 10px;
+            height: 10px;
+            position: relative;
+            background: rgba(255, 255, 255, 0.2);
+        }
+        .progress-bar {
+            height: 100%;
+            width: 0;
+            background-color: #4c8cff; /* Progress bar color */
+            transition: width 0.3s, transform 0.3s;
+            animation: progressAnimation 0.3s ease;
+        }
+        .history {
+            margin-top: 20px;
+        }
+        .history ul {
+            list-style: none;
+            padding: 0;
+        }
+        .history li {
+            margin-top: 10px;
+            padding: 10px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 4px;
+            opacity: 0; /* Start invisible */
+            transform: translateY(10px);
+            animation: fadeInUp 0.5s forwards; /* Fade in up for history items */
+            animation-delay: 0.1s; /* Delay for smoother effect */
+        }
+        .dark-mode .history li {
+            background: rgba(255, 255, 255, 0.2); /* Dark mode history item */
+        }
+        @keyframes rotate {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        @keyframes progressAnimation {
+            from { transform: scaleX(0); }
+            to { transform: scaleX(1); }
+        }
+        @keyframes fadeInUp {
+            0% { opacity: 0; transform: translateY(20px); }
+            100% { opacity: 1; transform: translateY(0); }
+        }
+        .theme-toggle {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            cursor: pointer;
+            padding: 8px;
+            border-radius: 50%;
+            background-color: #4c8cff; /* Toggle button color */
+            color: white;
+            transition: background-color 0.3s;
+        }
+        .theme-toggle:hover {
+            background-color: #0074e8;
+        }
+    </style>
+</head>
+<body>
+
+<div class="theme-toggle" onclick="toggleTheme()">🌙</div>
+
+<h1>Video Downloader</h1>
+<div class="input-section">
+    <input type="url" id="videoUrl" placeholder="Paste video URL here" required>
+    <select id="quality"></select>
+    <button onclick="downloadVideo()" id="downloadButton">Download Video</button>
+    <div class="message" id="errorMessage">Please enter a valid URL.</div>
+    <div class="loading" id="loadingMessage">⏳</div>
+    <div class="progress" id="progressContainer" style="display: none;">
+        <div class="progress-bar" id="progressBar"></div>
+    </div>
+</div>
+
+<div class="history-section">
+    <h2>Download History</h2>
+    <div class="history">
+        <ul id="downloadHistory"></ul>
+    </div>
+</div>
+
+<script>
+    let isDarkMode = false;
+
+    function toggleTheme() {
+        isDarkMode = !isDarkMode;
+        const body = document.body;
+        body.style.opacity = 0; // Fade out
+        setTimeout(() => {
+            body.classList.toggle("dark-mode", isDarkMode);
+            body.style.opacity = 1; // Fade in
+            document.querySelector('.theme-toggle').textContent = isDarkMode ? '☀️' : '🌙';
+        }, 500); // Duration of fade out
+    }
+  
+
+    async function downloadVideo() {
+        const videoUrl = document.getElementById("videoUrl").value;
+        const quality = document.getElementById("quality").value;
+        const errorMessage = document.getElementById("errorMessage");
+        const loadingMessage = document.getElementById("loadingMessage");
+        const progressContainer = document.getElementById("progressContainer");
+        const progressBar = document.getElementById("progressBar");
+
+        // Clear previous error message and hide spinner
+        errorMessage.classList.remove("show");
+        progressContainer.style.display = "none";
+        progressBar.style.width = '0';
+
+        if (!videoUrl || !isValidUrl(videoUrl)) {
+            errorMessage.classList.add("show");
+            return;
+        }
+
+       fetch('/api/example')
+    .then(response => response.json())
+    .then(data => {
+        console.log(data);
+        // Update your HTML with the data received
+        document.getElementById('output').innerText = data.message;
+    })
+    .catch(error => console.error('Error:', error));
+ loadingMessage.classList.add("show");
+
+        try {
+            const response = await fetch('/download', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ url: videoUrl, quality: quality })
+            });
+
+            if (!response.ok) {
+                throw new Error('Download failed');
+            }
+
+            const reader = response.body.getReader();
+            const contentLength = +response.headers.get('Content-Length');
+            let receivedLength = 0; // Length of data received so far
+
+            progressContainer.style.display = "block";
+
+            while (true) {
+                const { done, value } = await reader.read();
+
+                if (done) {
+                    break;
+                }
+
+                receivedLength += value.length;
+
+                // Calculate the percentage of the download
+                const percent = (receivedLength / contentLength) * 100;
+                progressBar.style.width = percent + '%';
+            }
+
+            loadingMessage.classList.remove("show");
+
+            // Adding to history
+            addToHistory(videoUrl, quality);
+
+        } catch (error) {
+            errorMessage.textContent = error.message;
+            errorMessage.classList.add("show");
+            loadingMessage.classList.remove("show");
+        }
+    }
+
+    function isValidUrl(url) {
+        const pattern = new RegExp('^(https?:\\/\\/)?'+ // protocol
+            '((([a-zA-Z0-9\\-]+\\.)+[a-zA-Z]{2,})|' + // domain name
+            'localhost|' + // localhost...
+            '\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}|'+ // IPv4
+            '\\[?[A-F0-9]*:[A-F0-9:]+\\]?)'+ // IPv6
+            '(\\:\\d+)?(\\/[-a-zA-Z0-9%_.~+:#]*)*$', 'i'); // port and path
+        return !!pattern.test(url);
+    }
+
+    function addToHistory(url, quality) {
+        const downloadHistory = document.getElementById("downloadHistory");
+        const li = document.createElement("li");
+        li.textContent = `${quality} Video from ${url}`;
+        downloadHistory.appendChild(li);
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+        const qualities = ["144p", "240p", "360p", "480p", "720p", "1080p","1440(2k)","2160(4k)","4320(8k)"];
+        const qualitySelect = document.getElementById("quality");
+
+        qualities.forEach(quality => {
+            const option = document.createElement("option");
+            option.value = quality;
+            option.textContent = quality;
+            qualitySelect.appendChild(option);
+        });
+
+        document.body.style.opacity = 1; // Fade in body after content loaded
+    });
+</script>
+</body>
+</html>
+<!-- partial -->
+  <script  src="./script.js"></script>
+
+</body>
+</html>
